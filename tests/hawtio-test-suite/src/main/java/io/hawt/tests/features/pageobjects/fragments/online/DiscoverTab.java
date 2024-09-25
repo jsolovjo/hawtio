@@ -30,7 +30,7 @@ public class DiscoverTab {
 
     public void connectTo(String name) {
         waitForPageLoaded();
-        new PodEntry($(ByUtils.byText("a", name)).ancestor("li")).connect();
+        new PodEntry($(ByUtils.byText("button", name)).ancestor("li")).connect();
         Selenide.switchTo().window(1);
     }
 
