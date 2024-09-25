@@ -27,7 +27,7 @@ public class DiscoverTab {
     private static final By SEARCH_DROPDOWN_BUTTON = By.cssSelector("button[aria-label=\"Options menu\"]");
 
     public static final boolean REPLICA_SET_WORKAROUND = true;
-    public static final String ACCORDION = "pf-v5-c-accordion";
+    public static final String ACCORDION = "pf-c-accordion";
 
     public void connectTo(String name) {
         waitForPageLoaded();
