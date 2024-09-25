@@ -27,7 +27,7 @@ public class AboutModalWindow {
     }
 
     public String getHeaderText() {
-        return $(MODAL_DIALOG).$(By.className("pf-c-title")).text();
+        return $("[id*='pf-about-modal-title']").text();
     }
 
     public Map<String, String> getAppComponents() {

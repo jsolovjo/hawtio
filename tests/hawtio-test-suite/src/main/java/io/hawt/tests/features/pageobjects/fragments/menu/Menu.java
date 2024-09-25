@@ -1,7 +1,6 @@
 package io.hawt.tests.features.pageobjects.fragments.menu;
 
 import static com.codeborne.selenide.Condition.attribute;
-import static com.codeborne.selenide.Condition.exist;
 import static com.codeborne.selenide.Condition.focused;
 import static com.codeborne.selenide.Condition.interactable;
 import static com.codeborne.selenide.Condition.not;
@@ -11,10 +10,6 @@ import static com.codeborne.selenide.Selenide.$;
 
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
-
-import java.time.Duration;
-
-import io.hawt.tests.features.utils.ByUtils;
 
 /**
  * Represent a left-side menu.
@@ -28,15 +23,18 @@ public class Menu {
      */
     public void navigateTo(String navItem) {
         final SelenideElement item = $(byLinkText(navItem));
-        final SelenideElement emptyStateContent = $(ByUtils.byLabel("Loading Hawtio"));
+        final SelenideElement emptyStateContent = $(byClassName("pf-c-empty-state__content"));
 
         toggleLeftSideBarIfCollapsed();
 
+        item.click();
 
         // Sometimes Selenide is faster than Hawtio and content is loaded properly
-        emptyStateContent.shouldNot(exist, Duration.ofSeconds(10));
+        if (emptyStateContent.exists()) {
+            Selenide.refresh();
+            item.click();
+        }
 
-        item.click();
         toggleLeftSideBarIfOverlaysCamelTree();
     }
 
