@@ -42,8 +42,8 @@ Feature: Checking the functionality of a Camel Specific Endpoint page.
     And User is on Camel "mock://bar" item of "endpoints" folder of "SampleCamel" context
     And User clicks on Camel "Send" tab
     When User sets "CamelFileName" header with value of "Test Name"
-    And User adds "Hello Test" message body
     And User sets "plaintext" message type
+    And User adds "Hello Test" message body
     And User sends the message
     And Successful alert message is appeared and closed
     Then User clicks on Camel "Browse" tab
