@@ -67,7 +67,7 @@ public class TestConfiguration {
     }
 
     public static boolean browserHeadless() {
-        return Boolean.parseBoolean(getProperty(BROWSER_HEADLESS, "true"));
+        return Boolean.parseBoolean(getProperty(BROWSER_HEADLESS, "false"));
     }
 
     public static AppDeployment getAppDeploymentMethod() {

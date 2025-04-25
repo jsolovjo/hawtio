@@ -1,6 +1,7 @@
 package io.hawt.tests.features.pageobjects.fragments.camel.tabs.endpoints;
 
 import static com.codeborne.selenide.Condition.enabled;
+import static com.codeborne.selenide.Condition.interactable;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.byAttribute;
 import static com.codeborne.selenide.Selectors.byTagAndText;
@@ -34,7 +35,7 @@ public class CamelSend extends CamelPage {
      */
     public void addMessageBody(String message) {
         // .sendKeys() work directly only with interactable inputs and textareas
-        $("div.view-line").click();
+        $("div.view-line").shouldBe(visible).click();
         actions().moveToElement($("div.view-line span span")).sendKeys(message).perform();
     }
 
