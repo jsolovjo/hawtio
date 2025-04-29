@@ -11,7 +11,6 @@ import io.hawt.tests.features.pageobjects.pages.camel.CamelPage;
 
 import com.codeborne.selenide.SelenideElement;
 
-
 /**
  * Represents Send Tab page in Camel Endpoints.
  */
@@ -37,11 +36,9 @@ public class CamelSend extends CamelPage {
      */
     public void addMessageBody(String message) {
         SelenideElement viewLine = $("div.view-line");
-        if (!viewLine.is(exist) || !viewLine.is(visible)) {
-            openTab("Browse");
-            openTab("Send");
-        }
-        viewLine.shouldBe(visible).click();
+        $(".pf-v6-c-code-editor__main").should(exist).shouldBe(visible);
+        $(".view-lines").should(exist).shouldBe(visible);
+        viewLine.should(exist).click();
 
         // .sendKeys() work directly only with interactable inputs and textareas
         actions().moveToElement($("div.view-line span span")).sendKeys(message).perform();
