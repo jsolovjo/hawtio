@@ -37,6 +37,7 @@ public class CamelSend extends CamelPage {
     public void addMessageBody(String message) {
         SelenideElement viewLine = $("div.view-line");
         $(".pf-v6-c-code-editor__main").should(exist).shouldBe(visible);
+        $(".pf-v5-c-form__group-control").should(exist);
         $(".view-lines").should(exist).shouldBe(visible);
         viewLine.should(exist).click();
 
