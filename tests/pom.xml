@@ -59,12 +59,6 @@
         <configuration>
           <redirectTestOutputToFile>false</redirectTestOutputToFile>
           <forkedProcessTimeoutInSeconds>0</forkedProcessTimeoutInSeconds>
-          <properties>
-            <property>
-              <name>junit.platform.listeners.summary.outputToConsole</name>
-              <value>true</value>
-            </property>
-          </properties>
         </configuration>
       </plugin>
     </plugins>
