@@ -1,6 +1,7 @@
 package io.hawt.tests.features.setup.deployment;
 
 import org.keycloak.admin.client.Keycloak;
+import org.testcontainers.containers.wait.strategy.Wait;
 
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import io.hawt.tests.features.config.TestConfiguration;
@@ -8,7 +9,10 @@ import io.hawt.tests.features.config.TestConfiguration;
 public class KeycloakDeployment {
 
     private static KeycloakContainer container = new KeycloakContainer(TestConfiguration.getKeycloakImage())
-        .withRealmImportFile("keycloak-demo-realm.json");
+        .withRealmImportFile("keycloak-demo-realm.json")
+        .waitingFor(
+            Wait.forLogMessage(".*Keycloak.*started.*\\n", 1)
+        );
 
     public static void start() {
         container.start();
