@@ -22,6 +22,22 @@ public class Auth implements io.fabric8.kubernetes.api.model.KubernetesResource 
     }
 
     /**
+     * Use SSL for internal communication.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("internalSSL")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Use SSL for internal communication")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private boolean internalSSL;
+
+    public boolean getInternalSSL() {
+        return  internalSSL;
+    }
+
+    public void setInternalSSL(boolean internalSSL) {
+        this.internalSSL = internalSSL;
+    }
+
+    /**
      * The generated client certificate CN
      */
     @com.fasterxml.jackson.annotation.JsonProperty("clientCertCommonName")

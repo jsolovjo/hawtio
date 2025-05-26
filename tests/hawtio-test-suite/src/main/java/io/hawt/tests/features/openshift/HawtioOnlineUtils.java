@@ -319,12 +319,14 @@ public class HawtioOnlineUtils {
     public static String deployNamespacedHawtio(String name, String namespace) {
         return deployHawtioCR(withBaseHawtio(name, namespace, hawtio -> {
             hawtio.getSpec().setType(HawtioSpec.Type.NAMESPACE);
+            hawtio.getSpec().getAuth().setInternalSSL(true);
         }));
     }
 
     public static String deployClusterHawtio(String name, String namespace) {
         return deployHawtioCR(withBaseHawtio(name, namespace, hawtio -> {
             hawtio.getSpec().setType(HawtioSpec.Type.CLUSTER);
+            hawtio.getSpec().getAuth().setInternalSSL(true);
         }));
     }
 
