@@ -37,6 +37,7 @@ public class WebDriver {
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage");
             options.addArguments("--headless=new");
+            options.addArguments("--disable-gpu");
             Configuration.browserCapabilities = options;
         } else {
             FirefoxOptions options = new FirefoxOptions();
