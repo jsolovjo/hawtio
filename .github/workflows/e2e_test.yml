@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - 4.x
+      - jsolovjo-ci-test-branch
     paths-ignore:
       - "**.md"
 
@@ -25,7 +26,7 @@ jobs:
       matrix:
         java: ["17", "21"]
         runtime: ["quarkus", "springboot", "quarkus-keycloak"]
-        browser: ["firefox"] # chrome disabled because of https://github.com/hawtio/hawtio-next/issues/478
+        browser: ["firefox", "chrome"] # chrome disabled because of https://github.com/hawtio/hawtio-next/issues/478
     env:
       REPORT_DIR: results-${{matrix.runtime}}-${{matrix.java}}-${{matrix.browser}}
     steps:
