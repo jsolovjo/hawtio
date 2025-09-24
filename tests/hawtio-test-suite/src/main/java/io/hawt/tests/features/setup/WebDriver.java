@@ -38,6 +38,7 @@ public class WebDriver {
             options.addArguments("--disable-dev-shm-usage");
             options.addArguments("--headless=new");
             options.addArguments("--disable-gpu");
+            options.addArguments("--disable-features=SameSiteByDefaultCookies");
             Configuration.browserCapabilities = options;
         } else {
             FirefoxOptions options = new FirefoxOptions();
