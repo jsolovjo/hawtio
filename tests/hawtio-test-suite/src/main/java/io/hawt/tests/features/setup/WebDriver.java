@@ -3,7 +3,6 @@ package io.hawt.tests.features.setup;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.GeckoDriverService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +11,6 @@ import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
 import com.google.common.collect.ImmutableMap;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -37,16 +34,9 @@ public class WebDriver {
             ChromeOptions options = new ChromeOptions();
             options.setExperimentalOption("prefs", ImmutableMap.of("credentials_enable_service", false, "profile.password_manager_enabled", false, "profile.password_manager_leak_detection", false));
             options.addArguments("--proxy-bypass-list=\"<-loopback>\"");
-            String tmpProfile = System.getProperty("chrome.user.data.dir");
-            if (tmpProfile == null) {
-                try {
-                    Path tempDir = Files.createTempDirectory("chrome-profile");
-                    tmpProfile = tempDir.toAbsolutePath().toString();
-                } catch (IOException e) {
-                    throw new RuntimeException("Failed to create temporary Chrome profile directory", e);
-                }
-            }
-            options.addArguments("--user-data-dir=" + tmpProfile);
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--headless=new");
             Configuration.browserCapabilities = options;
         } else {
             FirefoxOptions options = new FirefoxOptions();
@@ -54,8 +44,8 @@ public class WebDriver {
             //Trust the docker internal network
             options.addPreference("dom.securecontext.allowlist", "172.17.0.1");
             Configuration.browserCapabilities = options;
+            Configuration.headless = TestConfiguration.browserHeadless();
         }
-        Configuration.headless = TestConfiguration.browserHeadless();
         Configuration.browserSize = "1920x1080";
         Configuration.timeout = 20000;
 
