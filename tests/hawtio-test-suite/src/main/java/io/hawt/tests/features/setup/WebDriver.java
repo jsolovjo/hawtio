@@ -12,6 +12,8 @@ import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.Selenide;
 import com.google.common.collect.ImmutableMap;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -23,7 +25,7 @@ public class WebDriver {
     /**
      * Set up a web driver.
      */
-    public static void setup() {
+    public static void setup() throws IOException {
         LOG.info("Setting up a web browser options");
         if (TestConfiguration.isRunningInContainer()) {
             setupDriverPaths();
@@ -35,6 +37,12 @@ public class WebDriver {
             ChromeOptions options = new ChromeOptions();
             options.setExperimentalOption("prefs", ImmutableMap.of("credentials_enable_service", false, "profile.password_manager_enabled", false, "profile.password_manager_leak_detection", false));
             options.addArguments("--proxy-bypass-list=\"<-loopback>\"");
+            String tmpProfile = System.getProperty("chrome.user.data.dir");
+            if (tmpProfile == null) {
+                Path tempDir = Files.createTempDirectory("chrome-profile");
+                tmpProfile = tempDir.toAbsolutePath().toString();
+            }
+            options.addArguments("--user-data-dir=" + tmpProfile);
             Configuration.browserCapabilities = options;
         } else {
             FirefoxOptions options = new FirefoxOptions();
