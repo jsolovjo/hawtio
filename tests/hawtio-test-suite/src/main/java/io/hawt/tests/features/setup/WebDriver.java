@@ -25,7 +25,7 @@ public class WebDriver {
     /**
      * Set up a web driver.
      */
-    public static void setup() throws IOException {
+    public static void setup() {
         LOG.info("Setting up a web browser options");
         if (TestConfiguration.isRunningInContainer()) {
             setupDriverPaths();
@@ -39,8 +39,12 @@ public class WebDriver {
             options.addArguments("--proxy-bypass-list=\"<-loopback>\"");
             String tmpProfile = System.getProperty("chrome.user.data.dir");
             if (tmpProfile == null) {
-                Path tempDir = Files.createTempDirectory("chrome-profile");
-                tmpProfile = tempDir.toAbsolutePath().toString();
+                try {
+                    Path tempDir = Files.createTempDirectory("chrome-profile");
+                    tmpProfile = tempDir.toAbsolutePath().toString();
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to create temporary Chrome profile directory", e);
+                }
             }
             options.addArguments("--user-data-dir=" + tmpProfile);
             Configuration.browserCapabilities = options;
