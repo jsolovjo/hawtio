@@ -31,7 +31,8 @@ Feature: Checking the functionality of a specific camel context page.
     And User is on Camel "SampleCamel" context
     When User clicks on Camel "Operations" tab
     When User executes operation with name "getTotalRoutes()"
-    Then Result of "getTotalRoutes()" operation is "6"
+    Then The result of the "getTotalRoutes()" operation is stored
+    And Camel Attribute "TotalRoutes" has the same value as stored one
 
   Scenario: Check to view and edit chart of Specific Context
     Given User is on "Camel" page
