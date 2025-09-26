@@ -338,7 +338,42 @@ public class HawtioOperatorTest extends BaseHawtioOnlineTest {
     }
 
     @Test
-    public void testRBAC() throws IOException {
+    public void testDefaultRBAC() {
+        runTest(spec -> {
+            var rbac = new Rbac();
+            spec.setRbac(rbac);
+        }, sa -> {
+            var discoverTab = new DiscoverTab();
+            discoverTab.assertContainsDeployment(deployment.getMetadata().getName());
+            discoverTab.connectTo(podName);
+
+            WaitUtils.waitForPageLoad();
+            var hawtio = new HawtioPage();
+
+            hawtio.menu().navigateTo("Camel");
+            final CamelPage camelPage = new CamelPage();
+
+            camelPage.tree().selectSpecificItem("CamelContexts-folder-SampleCamel-folder");
+            camelPage.openTab("Operations");
+
+            final CamelOperations camelOperations = new CamelOperations();
+            camelOperations.checkOperation("stop()", Condition.enabled);
+            camelOperations.checkOperation("getTotalRoutes()", Condition.enabled);
+
+            hawtio.panel().logout();
+            new HawtioOnlineLoginPage().login("viewer", "viewer");
+
+            LoginLogout.hawtioIsLoaded();
+            camelPage.tree().selectSpecificItem("CamelContexts-folder-SampleCamel-folder");
+            camelPage.openTab("Operations");
+
+            camelOperations.checkOperation("stop()", Condition.disabled);
+            camelOperations.checkOperation("restart()", Condition.disabled);
+            camelOperations.checkOperation("getTotalRoutes()", Condition.enabled);
+        });
+    }
+    @Test
+    public void testCustomRBAC() throws IOException {
         OpenshiftClient.get().resource(new ConfigMapBuilder()
             .withNewMetadata()
             .withName("rbac-test")
@@ -423,7 +458,7 @@ public class HawtioOperatorTest extends BaseHawtioOnlineTest {
         }, "Waiting for all pods to be deployed", Duration.ofMinutes(1));
     }
 
-    private static void runTest(Consumer<HawtioSpec> consumer, Consumer<SoftAssertions> testFunction, boolean startBrowser) {
+    private static void runTest(Consumer<HawtioSpec> consumer, Consumer<SoftAssertions>  testFunction, boolean startBrowser) {
         hawtio =
             HawtioOnlineUtils.withBaseHawtio("operator-test-" + RandomStringUtils.randomAlphabetic(5).toLowerCase(),
                 TestConfiguration.getOpenshiftNamespace(),
