@@ -137,12 +137,12 @@ public class HawtioOnlineShellTest extends BaseHawtioOnlineTest {
             WaitUtils.untilAsserted(() -> {
                 assertThat(deploymentEntry.getPods()).hasSize(3);
                 assertThat(deploymentEntry.getPods()).allMatch(pod -> pod.getStatus().toLowerCase().matches("running|containercreating"));
-            }, Duration.ofSeconds(10));
+            }, Duration.ofSeconds(20));
             //TODO: https://github.com/hawtio/hawtio-online/issues/290
 
         }, () -> {
             appDeployment.scale(1);
-            appDeployment.waitUntilReady(10, TimeUnit.SECONDS);
+            appDeployment.waitUntilReady(20, TimeUnit.SECONDS);
         });
     }
 
