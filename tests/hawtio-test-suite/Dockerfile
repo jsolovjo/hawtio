@@ -13,6 +13,8 @@ COPY --from=firefoxImage / /
 COPY --from=chromeImage / /
 
 WORKDIR /workspace
+ARG CACHE_BUST=unknown
+RUN echo "Cache bust: ${CACHE_BUST}"
 COPY ./ ./
 RUN mvn dependency:go-offline -Pe2e -pl :hawtio-test-suite -am -P!local-test-app-dependency
 RUN mvn clean install -Pe2e -DskipTests=true -pl :hawtio-test-suite -am -P!local-test-app-dependency
