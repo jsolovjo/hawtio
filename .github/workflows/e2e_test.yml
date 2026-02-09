@@ -45,9 +45,9 @@ jobs:
           for i in /tmp/images/*.tar; do
             docker load --input $i
           done
-      - name: Verify test-suite has JDK_JAVA_OPTIONS fix
+      - name: Verify test-suite has JFR module fix
         run: |
-          docker run --rm hawtio-test-suite:${{ matrix.java }} cat /workspace/tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep -A 5 "JDK_JAVA_OPTIONS" || echo "WARNING: JDK_JAVA_OPTIONS not found in DockerDeployment.java"
+          docker run --rm hawtio-test-suite:${{ matrix.java }} cat /workspace/tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "add-modules" || echo "WARNING: --add-modules flag not found in DockerDeployment.java"
       - name: ${{ matrix.runtime }} E2E test (Java ${{ matrix.java }})
         id: test
         run: |
