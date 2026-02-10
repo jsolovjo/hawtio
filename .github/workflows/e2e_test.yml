@@ -100,9 +100,22 @@ jobs:
           cache: "" # Disabled to prevent stale target/ directory caching
       - name: Docker Setup QEMU
         uses: docker/setup-qemu-action@v3.6.0
+      - name: Verify workspace source before build
+        run: |
+          echo "=== Checking source file in workspace BEFORE Docker build ==="
+          cat tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "JFR_DEPLOY_VER_1" && echo "✓ WORKSPACE: Fresh source confirmed" || echo "✗ WORKSPACE: STALE SOURCE"
+      - name: Clean Docker plugin staging area
+        run: |
+          echo "=== Forcefully cleaning maven-docker-plugin cache ==="
+          rm -rf tests/hawtio-test-suite/target/docker
+          find . -type d -path "*/target/docker" -prune -exec rm -rf {} \; || true
       - name: Build
         run: |
           mvn --batch-mode --no-transfer-progress clean install -DskipTests -Pe2e -Pdocker-testsuite -Ptests-docker -Dhawtio-container -Ddocker.buildArg.CACHE_BUST=${{ github.run_id }} -pl :hawtio-test-suite,:hawtio-tests-quarkus,:hawtio-tests-springboot -am
+      - name: Verify BUILT image has fresh source
+        run: |
+          echo "=== BUILD JOB: Checking image built in this job ==="
+          docker run --rm hawtio-test-suite:${{ matrix.java }} cat /workspace/tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "JFR_DEPLOY_VER_1" && echo "✓ BUILD: Fresh source confirmed" || echo "✗ BUILD: STALE SOURCE IN BUILT IMAGE"
       - name: Export docker images
         run: |
           mkdir -p /tmp/images/
