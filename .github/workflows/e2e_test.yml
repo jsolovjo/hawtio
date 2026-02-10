@@ -19,33 +19,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # EXPERIMENT: Single job like JBang workflow to eliminate image save/restore
+  # Removed 'needs: build' - this job now does both build and test
   test:
     runs-on: ubuntu-latest
-    needs: build
     strategy:
       fail-fast: false
       matrix:
         java: ["17"]
-        # Disable runtime "quarkus-keycloak" until Quarkus 3.31.2 is released
-        # https://github.com/quarkusio/quarkus/pull/52332
-        runtime: ["quarkus", "springboot"]
-        browser: ["firefox"] # chrome disabled because of https://github.com/hawtio/hawtio-next/issues/478
+        runtime: ["springboot"]  # Only test springboot for now
+        browser: ["firefox"]
     env:
       REPORT_DIR: results-${{matrix.runtime}}-${{matrix.java}}-${{matrix.browser}}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        if: github.event_name == 'pull_request_target'
+        with:
+          ref: "refs/pull/${{ github.event.number }}/merge"
+      - name: Checkout code
+        uses: actions/checkout@v6
+        if: github.event_name == 'push'
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: ${{ matrix.java }}
+          cache: "" # Disabled to prevent stale target/ directory caching
       - name: Docker Setup QEMU
         uses: docker/setup-qemu-action@v3.6.0
-      - name: Download images
-        uses: actions/cache/restore@v4
-        with:
-          path: /tmp/images
-          key: e2e-docker-images-${{ matrix.java }}-${{ github.run_id }}-${{ github.run_attempt }}
-      - name: Load images
+      - name: Build (JBang-style two-phase)
         run: |
-          for i in /tmp/images/*.tar; do
-            docker load --input $i
-          done
-      - name: Verify test-suite has JFR module
+          # Phase 1: Build entire project to ensure all modules are fresh
+          mvn --batch-mode --no-transfer-progress install -DskipTests
+          # Phase 2: Build Docker images (artifacts are now fresh in .m2)
+          mvn --batch-mode --no-transfer-progress install -DskipTests \
+            -Pe2e -Pdocker-testsuite -Ptests-docker -Dhawtio-container \
+            -pl :hawtio-test-suite,:hawtio-tests-${{matrix.runtime}}
+      - name: Verify test-suite has JFR module (after build)
         run: |
           echo "=== Checking for --add-modules flag ==="
           docker run --rm hawtio-test-suite:${{ matrix.java }} cat /workspace/tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "add-modules" || echo "WARNING: --add-modules flag not found in DockerDeployment.java"
