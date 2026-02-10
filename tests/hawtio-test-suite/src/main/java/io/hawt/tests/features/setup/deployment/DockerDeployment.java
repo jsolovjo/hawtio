@@ -33,7 +33,7 @@ public class DockerDeployment implements AppDeployment {
 
     @Override
     public void start() {
-        LOG.info("Starting container {}", dockerImage);
+        LOG.info("JFR_DEPLOY_VER_1 - Starting container {}", dockerImage);
 
         final String jfrOpts = "--add-modules=jdk.management.jfr " +
             "-XX:+UnlockDiagnosticVMOptions " +

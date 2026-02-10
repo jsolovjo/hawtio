@@ -47,7 +47,10 @@ jobs:
           done
       - name: Verify test-suite has JFR module
         run: |
+          echo "=== Checking for --add-modules flag ==="
           docker run --rm hawtio-test-suite:${{ matrix.java }} cat /workspace/tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "add-modules" || echo "WARNING: --add-modules flag not found in DockerDeployment.java"
+          echo "=== Checking for JFR_DEPLOY_VER_1 marker ==="
+          docker run --rm hawtio-test-suite:${{ matrix.java }} cat /workspace/tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "JFR_DEPLOY_VER_1" || echo "WARNING: JFR_DEPLOY_VER_1 marker not found in DockerDeployment.java"
       - name: ${{ matrix.runtime }} E2E test (Java ${{ matrix.java }})
         id: test
         run: |
@@ -94,7 +97,7 @@ jobs:
         with:
           distribution: "temurin"
           java-version: ${{ matrix.java }}
-          cache: "maven"
+          cache: "" # Disabled to prevent stale target/ directory caching
       - name: Docker Setup QEMU
         uses: docker/setup-qemu-action@v3.6.0
       - name: Build
