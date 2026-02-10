@@ -59,9 +59,9 @@ jobs:
       - name: Verify test-suite has JFR module (after build)
         run: |
           echo "=== Checking for --add-modules flag ==="
-          docker run --rm hawtio-test-suite:${{ matrix.java }} cat /workspace/tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "add-modules" || echo "WARNING: --add-modules flag not found in DockerDeployment.java"
+          docker run --rm hawtio-test-suite:${{ matrix.java }} cat /hawtio-ci-build/tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "add-modules" || echo "WARNING: --add-modules flag not found in DockerDeployment.java"
           echo "=== Checking for JFR_DEPLOY_VER_1 marker ==="
-          docker run --rm hawtio-test-suite:${{ matrix.java }} cat /workspace/tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "JFR_DEPLOY_VER_1" || echo "WARNING: JFR_DEPLOY_VER_1 marker not found in DockerDeployment.java"
+          docker run --rm hawtio-test-suite:${{ matrix.java }} cat /hawtio-ci-build/tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "JFR_DEPLOY_VER_1" || echo "WARNING: JFR_DEPLOY_VER_1 marker not found in DockerDeployment.java"
       - name: ${{ matrix.runtime }} E2E test (Java ${{ matrix.java }})
         id: test
         run: |
@@ -73,8 +73,8 @@ jobs:
           fi
           docker run --rm \
           -v /var/run/docker.sock:/var/run/docker.sock \
-          -v $PWD/$REPORT_DIR:/workspace/tests/hawtio-test-suite/target \
-          -v $PWD/$REPORT_DIR/build:/workspace/tests/hawtio-test-suite/build/ \
+          -v $PWD/$REPORT_DIR:/hawtio-ci-build/tests/hawtio-test-suite/target \
+          -v $PWD/$REPORT_DIR/build:/hawtio-ci-build/tests/hawtio-test-suite/build/ \
           --shm-size="2g" \
             hawtio-test-suite:${{ matrix.java }} -Pe2e-${runtime} -Dselenide.browser=${{ matrix.browser }} \
             -Dio.hawt.test.docker.image=hawtio-${runtime}-app:${{ matrix.java }} $extra_args
@@ -87,62 +87,6 @@ jobs:
             ${{ env.REPORT_DIR }}/build/reports/tests/*.png
             ${{ env.REPORT_DIR }}/*.log
             ${{ env.REPORT_DIR }}/cucumber-reports/*
-
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        java: ["17"]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-        if: github.event_name == 'pull_request_target'
-        with:
-          ref: "refs/pull/${{ github.event.number }}/merge"
-      - name: Checkout code
-        uses: actions/checkout@v6
-        if: github.event_name == 'push'
-      - name: Set up Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: "temurin"
-          java-version: ${{ matrix.java }}
-          cache: "" # Disabled to prevent stale target/ directory caching
-      - name: Docker Setup QEMU
-        uses: docker/setup-qemu-action@v3.6.0
-      - name: Verify workspace source before build
-        run: |
-          echo "=== Checking source file in workspace BEFORE Docker build ==="
-          cat tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "JFR_DEPLOY_VER_1" && echo "✓ WORKSPACE: Fresh source confirmed" || echo "✗ WORKSPACE: STALE SOURCE"
-      - name: Build (two-phase like JBang)
-        run: |
-          # Phase 1: Build entire project to ensure all modules are fresh
-          mvn --batch-mode --no-transfer-progress clean install -DskipTests
-          # Phase 2: Build Docker images (artifacts are now fresh in .m2)
-          mvn --batch-mode --no-transfer-progress install -DskipTests \
-            -Pe2e -Pdocker-testsuite -Ptests-docker -Dhawtio-container \
-            -Ddocker.buildArg.CACHE_BUST=${{ github.run_id }} \
-            -pl :hawtio-test-suite,:hawtio-tests-quarkus,:hawtio-tests-springboot
-      - name: Inspect docker-build.tar contents
-        run: |
-          echo "=== Checking what maven-docker-plugin put in docker-build.tar ==="
-          tar -xOf tests/hawtio-test-suite/target/docker/hawtio-test-suite/17/tmp/docker-build.tar tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "JFR_DEPLOY_VER_1" && echo "✓ TAR: Fresh source" || echo "✗ TAR: STALE SOURCE"
-      - name: Verify BUILT image has fresh source
-        run: |
-          echo "=== BUILD JOB: Checking image built in this job ==="
-          docker run --rm hawtio-test-suite:${{ matrix.java }} cat /workspace/tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "JFR_DEPLOY_VER_1" && echo "✓ BUILD: Fresh source confirmed" || echo "✗ BUILD: STALE SOURCE IN BUILT IMAGE"
-      - name: Export docker images
-        run: |
-          mkdir -p /tmp/images/
-          docker save hawtio-test-suite:${{ matrix.java }} > /tmp/images/hawtio-test-suite-${{ matrix.java }}.tar
-          docker save hawtio-quarkus-app:${{ matrix.java }} > /tmp/images/hawtio-quarkus-app-${{ matrix.java }}.tar
-          docker save hawtio-springboot-app:${{ matrix.java }} > /tmp/images/hawtio-springboot-app-${{ matrix.java }}.tar
-      - name: Cache images
-        uses: actions/cache/save@v4
-        with:
-          path: /tmp/images
-          key: e2e-docker-images-${{ matrix.java }}-${{ github.run_id }}-${{ github.run_attempt }}
 
   publish-results:
     runs-on: ubuntu-latest

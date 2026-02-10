@@ -12,15 +12,23 @@ COPY --from=firefoxImage / /
 
 COPY --from=chromeImage / /
 
-WORKDIR /workspace
+# Use unique directory to avoid any layer collision with base images
+WORKDIR /hawtio-ci-build
+
+# Force cache invalidation with build arg
 ARG CACHE_BUST=unknown
-RUN echo "Cache bust: ${CACHE_BUST}"
+RUN echo "Build ID: ${CACHE_BUST}"
+
+# Copy fresh source into unique directory
 COPY ./ ./
+
+# Build the test suite
 RUN mvn dependency:go-offline -Pe2e -pl :hawtio-test-suite -am -P!local-test-app-dependency
 RUN mvn clean install -Pe2e -DskipTests=true -pl :hawtio-test-suite -am -P!local-test-app-dependency
 
 RUN chown root /home/seluser/
 
-WORKDIR /workspace/tests/hawtio-test-suite
+# Final working directory for test execution
+WORKDIR /hawtio-ci-build/tests/hawtio-test-suite
 
 ENTRYPOINT ["bash" , "./container_entrypoint.sh"]
