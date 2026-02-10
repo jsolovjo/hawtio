@@ -285,6 +285,11 @@
                     <dockerFile>${basedir}/Dockerfile</dockerFile>
                     <contextDir>${session.executionRootDirectory}</contextDir>
                     <noCache>true</noCache>
+                    <cleanup>try</cleanup>
+                    <buildOptions>
+                      <shmsize>268435456</shmsize>
+                      <nocache>true</nocache>
+                    </buildOptions>
                   </build>
                 </image>
               </images>

@@ -104,14 +104,19 @@ jobs:
         run: |
           echo "=== Checking source file in workspace BEFORE Docker build ==="
           cat tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "JFR_DEPLOY_VER_1" && echo "✓ WORKSPACE: Fresh source confirmed" || echo "✗ WORKSPACE: STALE SOURCE"
-      - name: Clean Docker plugin staging area
+      - name: Build (two-phase like JBang)
         run: |
-          echo "=== Forcefully cleaning maven-docker-plugin cache ==="
-          rm -rf tests/hawtio-test-suite/target/docker
-          find . -type d -path "*/target/docker" -prune -exec rm -rf {} \; || true
-      - name: Build
+          # Phase 1: Build entire project to ensure all modules are fresh
+          mvn --batch-mode --no-transfer-progress clean install -DskipTests
+          # Phase 2: Build Docker images (artifacts are now fresh in .m2)
+          mvn --batch-mode --no-transfer-progress install -DskipTests \
+            -Pe2e -Pdocker-testsuite -Ptests-docker -Dhawtio-container \
+            -Ddocker.buildArg.CACHE_BUST=${{ github.run_id }} \
+            -pl :hawtio-test-suite,:hawtio-tests-quarkus,:hawtio-tests-springboot
+      - name: Inspect docker-build.tar contents
         run: |
-          mvn --batch-mode --no-transfer-progress clean install -DskipTests -Pe2e -Pdocker-testsuite -Ptests-docker -Dhawtio-container -Ddocker.buildArg.CACHE_BUST=${{ github.run_id }} -pl :hawtio-test-suite,:hawtio-tests-quarkus,:hawtio-tests-springboot -am
+          echo "=== Checking what maven-docker-plugin put in docker-build.tar ==="
+          tar -xOf tests/hawtio-test-suite/target/docker/hawtio-test-suite/17/tmp/docker-build.tar tests/hawtio-test-suite/src/main/java/io/hawt/tests/features/setup/deployment/DockerDeployment.java | grep "JFR_DEPLOY_VER_1" && echo "✓ TAR: Fresh source" || echo "✗ TAR: STALE SOURCE"
       - name: Verify BUILT image has fresh source
         run: |
           echo "=== BUILD JOB: Checking image built in this job ==="
