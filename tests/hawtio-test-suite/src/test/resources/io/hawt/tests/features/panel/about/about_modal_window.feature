@@ -22,3 +22,9 @@ Feature: Check whether all data is presented and displayed correctly in About mo
       | component     |
       | Hawtio React  |
       | Hawtio Online |
+
+  @notOnline
+  Scenario: Verify Hawtio React version in About modal (debug)
+    Given User clicks on "About" option in Question mark drop-down menu
+    Then The Hawtio React version should be captured and verified
+    And About modal window is closed
