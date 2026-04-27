@@ -179,7 +179,7 @@ org.apache.camel.context:
   getLoad15: admin, viewer
   getCamelVersion: admin, viewer
   getApplicationContextClassName: admin, viewer
-#  getTotalRoutes: admin, viewer
+  #  getTotalRoutes: admin, viewer
   getStartedRoutes: admin, viewer
   isMessageHistory: admin, viewer
   getTimeUnit: admin, viewer
