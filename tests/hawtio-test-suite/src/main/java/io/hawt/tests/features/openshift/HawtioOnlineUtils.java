@@ -437,12 +437,16 @@ public class HawtioOnlineUtils {
     }
 
     public static String deployHawtioCR(Hawtio hawtio) {
+        final String namespace = hawtio.getMetadata().getNamespace();
+        final String hawtioCrName = hawtio.getMetadata().getName();
         hawtio.getMetadata().getFinalizers().clear();
-        OpenshiftClient.get().resources(Hawtio.class).createOrReplace(hawtio);
+
+        OpenshiftClient.get().resources(Hawtio.class).inNamespace(namespace).createOrReplace(hawtio);
 
         WaitUtils.waitFor(() -> {
             final Resource<Hawtio> resource = OpenshiftClient.get().resources(Hawtio.class)
-                .withName(hawtio.getMetadata().getName());
+                .inNamespace(namespace)
+                .withName(hawtioCrName);
             final Hawtio hawtioResource = resource.get();
             return resource.isReady() &&
                 hawtioResource.getStatus() != null &&
@@ -451,8 +455,7 @@ public class HawtioOnlineUtils {
                 hawtioResource.getStatus().getURL() != null;
         }, "Waiting for hawtio deployment to succeed", Duration.ofMinutes(2));
 
-        return OpenshiftClient.get().resources(Hawtio.class).withName(hawtio.getMetadata().getName()).get().getStatus()
-            .getURL();
+        return OpenshiftClient.get().resources(Hawtio.class).inNamespace(namespace).withName(hawtioCrName).get().getStatus().getURL();
     }
 
     public static String deployNamespacedHawtio(String name, String namespace) {
@@ -481,14 +484,16 @@ public class HawtioOnlineUtils {
     public static void patchHawtioResource(String name, Consumer<Hawtio> action) {
         WaitUtils.withRetry(() -> {
             final Hawtio hawtio = OpenshiftClient.get().resources(Hawtio.class).withName(name).get();
+            final String namespace = hawtio.getMetadata().getNamespace();
             action.accept(hawtio);
-            OpenshiftClient.get().resources(Hawtio.class).withName(name).patch(hawtio);
+            OpenshiftClient.get().resources(Hawtio.class).inNamespace(namespace).withName(name).patch(hawtio);
         }, 5, Duration.ofMillis(500));
     }
 
     public static void patchHawtioResource(String name, Hawtio value) {
         WaitUtils.withRetry(() -> {
-            OpenshiftClient.get().resources(Hawtio.class).withName(name).patch(value);
+            final String namespace = value.getMetadata().getNamespace();
+            OpenshiftClient.get().resources(Hawtio.class).inNamespace(namespace).withName(name).patch(value);
         }, 5, Duration.ofMillis(500));
     }
 

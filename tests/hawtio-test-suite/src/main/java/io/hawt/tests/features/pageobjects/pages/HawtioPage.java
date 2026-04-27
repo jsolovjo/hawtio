@@ -9,6 +9,8 @@ import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Condition.interactable;
 import static com.codeborne.selenide.Condition.matchText;
 import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selectors.byClassName;
+import static com.codeborne.selenide.Selectors.byTagName;
 import static com.codeborne.selenide.Selectors.byXpath;
 import static com.codeborne.selenide.Selectors.byTagAndText;
 import static com.codeborne.selenide.Selenide.$;
@@ -22,8 +24,8 @@ import com.codeborne.selenide.SelenideElement;
  * Represents Hawtio page with common methods.
  */
 public class HawtioPage {
-
-    private static final By HEADER_SELECTOR = By.id("hawtio-header-brand");
+    private static final By HAWTIO_HEADER_SELECTOR = By.id("hawtio-header");
+    private static final By HAWTIO_HEADER_BRAND_SELECTOR = By.id("hawtio-header-brand");
 
     private final Menu menu;
     private final Panel panel;
@@ -124,11 +126,11 @@ public class HawtioPage {
     }
 
     public SelenideElement getLogo() {
-        return $(HEADER_SELECTOR).$(By.className("pf-v6-c-brand"));
+        return $(HAWTIO_HEADER_BRAND_SELECTOR).$(byClassName("pf-v6-c-brand"));
     }
 
     public String getAppName() {
-        return $(HEADER_SELECTOR).$(By.tagName("h1")).text();
+        return $(HAWTIO_HEADER_SELECTOR).$(byTagName("h1")).text();
     }
 
     /**

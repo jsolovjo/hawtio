@@ -1,5 +1,7 @@
 package io.hawt.tests.features.pageobjects.fragments.online;
 
+import static com.codeborne.selenide.Condition.exist;
+import static com.codeborne.selenide.Selectors.byTagName;
 import static com.codeborne.selenide.Selenide.$;
 
 import org.apache.commons.lang3.StringUtils;
@@ -63,7 +65,7 @@ public class DiscoverTab {
 
     public Map<String, DeploymentEntry> getDeployments() {
         waitForPageLoaded();
-        return $(ACTIVE_DEPLOYMENT_LIST).$$(By.tagName("dt")).asFixedIterable().stream().map(DeploymentEntry::new)
+        return $(ACTIVE_DEPLOYMENT_LIST).$$(byTagName("dt")).asFixedIterable().stream().map(DeploymentEntry::new)
             .collect(Collectors.toMap(DeploymentEntry::getName, d -> d));
     }
 
@@ -73,8 +75,9 @@ public class DiscoverTab {
     }
 
     public void selectNamespace(String namespace) {
+        waitForPageLoaded();
         final SelenideElement namespaceTab = $(DISCOVER_TABS).$(ByUtils.byPartialText(namespace));
-        namespaceTab.should(Condition.exist, Duration.ofMinutes(1));
+        namespaceTab.should(exist, Duration.ofSeconds(10));
         if (namespaceTab.is(Condition.interactable)) {
             namespaceTab.click();
         }
@@ -113,7 +116,7 @@ public class DiscoverTab {
     }
 
     private void waitForPageLoaded() {
-        $(ByUtils.byDataTestId("loading")).shouldNot(Condition.exist, Duration.ofSeconds(30));
-        $(ACTIVE_DEPLOYMENT_LIST).should(Condition.exist, Duration.ofSeconds(30));
+        $(ByUtils.byDataTestId("loading")).shouldNot(exist, Duration.ofSeconds(30));
+        $(ACTIVE_DEPLOYMENT_LIST).should(exist, Duration.ofSeconds(30));
     }
 }
