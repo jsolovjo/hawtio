@@ -7,7 +7,6 @@ import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Condition.exist;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.byAttribute;
-import static com.codeborne.selenide.Selectors.byTagAndText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.TextMatchOptions.partialText;
 
@@ -23,7 +22,7 @@ import com.codeborne.selenide.WebElementCondition;
 public class CamelOperations extends CamelPage {
 
     private static final By EXPAND_BUTTON_SELECTOR = byAttribute( "aria-label", "Details");
-    private static final By EXECUTE_BUTTON_SELECTOR = byTagAndText("span", "Execute");
+    private static final By EXECUTE_BUTTON_SELECTOR = By.xpath(".//button[contains(., 'Execute')]");
     private static final By RESULT_PRE_SELECTOR = By.tagName("pre");
     private static final By DISABLED_ICON_SELECTOR = By.cssSelector(".pf-v6-c-data-list__item-content svg");
 

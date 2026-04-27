@@ -39,11 +39,13 @@ public class ClusterDiscoveryTest extends BaseHawtioOnlineTest {
 
     @AfterAll
     public static void cleanup() {
-        OpenshiftClient.get().resources(Hawtio.class).withName(CLUSTER_HAWTIO_NAME).delete();
+        OpenshiftClient.get().resources(Hawtio.class)
+            .inNamespace(TestConfiguration.getOpenshiftNamespace())
+            .withName(CLUSTER_HAWTIO_NAME).delete();
     }
 
     @Test
-    public void basicTest() {
+    public void testClusterModeDiscoversCrossNamespaceApps() {
         final String namespace = "e2e-discover-namespace-" + RandomStringUtils.randomAlphabetic(5).toLowerCase();
 
         HawtioOnlineTestUtils.withCleanup(() -> {
