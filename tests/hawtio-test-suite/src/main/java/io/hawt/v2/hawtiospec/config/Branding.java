@@ -1,16 +1,33 @@
 package io.hawt.v2.hawtiospec.config;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({"appLogoUrl","appName","css","favicon"})
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({"appLogoDarkModeUrl","appLogoUrl","appName","css","favicon","showAppName"})
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 public class Branding implements io.fabric8.kubernetes.api.model.KubernetesResource {
 
     /**
-     * The URL of the logo, that displays in the navigation bar.
+     * The URL of the logo, that displays in the navigation bar in dark mode.
+     * It can be a path, relative to the Hawtio status URL, or an absolute URL.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("appLogoDarkModeUrl")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("The URL of the logo, that displays in the navigation bar in dark mode.\nIt can be a path, relative to the Hawtio status URL, or an absolute URL.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private String appLogoDarkModeUrl;
+
+    public String getAppLogoDarkModeUrl() {
+        return appLogoDarkModeUrl;
+    }
+
+    public void setAppLogoDarkModeUrl(String appLogoDarkModeUrl) {
+        this.appLogoDarkModeUrl = appLogoDarkModeUrl;
+    }
+
+    /**
+     * The URL of the logo, that displays in the navigation bar, by default.
      * It can be a path, relative to the Hawtio status URL, or an absolute URL.
      */
     @com.fasterxml.jackson.annotation.JsonProperty("appLogoUrl")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("The URL of the logo, that displays in the navigation bar.\nIt can be a path, relative to the Hawtio status URL, or an absolute URL.")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("The URL of the logo, that displays in the navigation bar, by default.\nIt can be a path, relative to the Hawtio status URL, or an absolute URL.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String appLogoUrl;
 
@@ -70,6 +87,22 @@ public class Branding implements io.fabric8.kubernetes.api.model.KubernetesResou
 
     public void setFavicon(String favicon) {
         this.favicon = favicon;
+    }
+
+    /**
+     * Whether to display the application name in the header bar.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("showAppName")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Whether to display the application name in the header bar.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private Boolean showAppName;
+
+    public Boolean getShowAppName() {
+        return showAppName;
+    }
+
+    public void setShowAppName(Boolean showAppName) {
+        this.showAppName = showAppName;
     }
 }
 
