@@ -1,15 +1,16 @@
 package io.hawt.v2.hawtiospec.config;
 
 @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
-@com.fasterxml.jackson.annotation.JsonPropertyOrder({"additionalInfo","copyright","imgSrc","productInfo","title"})
+@com.fasterxml.jackson.annotation.JsonPropertyOrder({"additionalInfo","backgroundImgSrc","copyright","imgDarkModeSrc","imgSrc","productInfo","title"})
 @com.fasterxml.jackson.databind.annotation.JsonDeserialize(using = com.fasterxml.jackson.databind.JsonDeserializer.None.class)
 public class About implements io.fabric8.kubernetes.api.model.KubernetesResource {
 
     /**
-     * The text for the description section
+     * Deprecated: Use Description instead. This field is retained for backwards
+     * compatibility but will be removed in a future release.
      */
     @com.fasterxml.jackson.annotation.JsonProperty("additionalInfo")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("The text for the description section")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("Deprecated: Use Description instead. This field is retained for backwards\ncompatibility but will be removed in a future release.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String additionalInfo;
 
@@ -19,6 +20,22 @@ public class About implements io.fabric8.kubernetes.api.model.KubernetesResource
 
     public void setAdditionalInfo(String additionalInfo) {
         this.additionalInfo = additionalInfo;
+    }
+
+    /**
+     * The background image to display on the About dialog
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("backgroundImgSrc")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("The background image to display on the About dialog")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private String backgroundImgSrc;
+
+    public String getBackgroundImgSrc() {
+        return backgroundImgSrc;
+    }
+
+    public void setBackgroundImgSrc(String backgroundImgSrc) {
+        this.backgroundImgSrc = backgroundImgSrc;
     }
 
     /**
@@ -38,11 +55,28 @@ public class About implements io.fabric8.kubernetes.api.model.KubernetesResource
     }
 
     /**
-     * The image displayed in the page.
+     * The image displayed in the page if the theme is dark mode.
+     * It can be a path, relative to the Hawtio status URL, or an absolute URL.
+     */
+    @com.fasterxml.jackson.annotation.JsonProperty("imgDarkModeSrc")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("The image displayed in the page if the theme is dark mode.\nIt can be a path, relative to the Hawtio status URL, or an absolute URL.")
+    @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
+    private String imgDarkModeSrc;
+
+    public String getImgDarkModeSrc() {
+        return imgDarkModeSrc;
+    }
+
+    public void setImgDarkModeSrc(String imgDarkModeSrc) {
+        this.imgDarkModeSrc = imgDarkModeSrc;
+    }
+
+    /**
+     * The image displayed in the page, by default.
      * It can be a path, relative to the Hawtio status URL, or an absolute URL.
      */
     @com.fasterxml.jackson.annotation.JsonProperty("imgSrc")
-    @com.fasterxml.jackson.annotation.JsonPropertyDescription("The image displayed in the page.\nIt can be a path, relative to the Hawtio status URL, or an absolute URL.")
+    @com.fasterxml.jackson.annotation.JsonPropertyDescription("The image displayed in the page, by default.\nIt can be a path, relative to the Hawtio status URL, or an absolute URL.")
     @com.fasterxml.jackson.annotation.JsonSetter(nulls = com.fasterxml.jackson.annotation.Nulls.SKIP)
     private String imgSrc;
 
